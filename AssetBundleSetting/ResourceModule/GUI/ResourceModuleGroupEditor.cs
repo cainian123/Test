@@ -1,6 +1,5 @@
 ﻿using System;
 using AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView;
-using AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeViewItem;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
@@ -58,6 +57,7 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.GUI
             m_EntryTree.Reload();
             return m_EntryTree;
         }
+        
         
 
         public void OnDisable()

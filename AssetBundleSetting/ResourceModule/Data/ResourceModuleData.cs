@@ -8,7 +8,9 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.Data
         private AssetPackageEnum m_AssetPackageEnum;
         private string m_ResourceModuleName;
         private List<AssetBaseInfo> m_AssetConfigDatas;
-        
+
+        public List<AssetBaseInfo> AssetConfigDatas => m_AssetConfigDatas;
+
         public string ResourceModuleName => m_ResourceModuleName;
 
         public ResourceModuleData(AssetPackageEnum packageEnum,string resourceModuleName,List<AssetInfoConfig> configs)
@@ -25,13 +27,47 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.Data
             {
                 foreach (var config in configs)
                 {
-                    AssetBaseInfo info = new AssetBaseInfo(config.fullPath,m_ResourceModuleName,m_AssetPackageEnum,null);
-                    info.LoadChild(config.invalidChildConfigs);
-                    m_AssetConfigDatas.Add(info);
+                    AssetBaseInfo info = new AssetBaseInfo(config.FullPath, m_ResourceModuleName, m_AssetPackageEnum, null);
+                    info.LoadChild(configs, config.InvalidChildConfigs);
+                    m_AssetConfigDatas.Add(info);   
                 }
             }
         }
 
+        public void ForceLoadAssetInfo(List<AssetInfoConfig> configs)
+        {
+            LoadAssetInfo(configs);
+        }
+
+        /*private void LoadAssetInfo(List<AssetInfoConfig> configs)
+        {
+            m_AssetConfigDatas = new List<AssetBaseInfo>();
+            if (configs != null && configs.Count > 0)
+            {
+                
+                foreach (var config in configs)
+                {
+                    List<AssetInfoConfig> temp = new List<AssetInfoConfig>();
+                    config.GetEfficientPath(ref temp);
+                    if (temp.Count > 0)
+                    {
+                        foreach (var assetInfoConfig in temp)
+                        {
+                            AssetBaseInfo info = new AssetBaseInfo(assetInfoConfig.FullPath, m_ResourceModuleName, m_AssetPackageEnum, null, true);
+                            info.LoadChild(assetInfoConfig.ChildConfigs);
+                            m_AssetConfigDatas.Add(info);   
+                        }
+                    }
+                   
+                }
+            }
+        }
+
+        public void ForceLoadAssetInfo(List<AssetInfoConfig> configs)
+        {
+            LoadAssetInfo(configs);
+        }
+*/
         public void RenamePackage(string newName)
         {
             m_ResourceModuleName = newName;

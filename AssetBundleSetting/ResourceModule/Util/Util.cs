@@ -1,3 +1,5 @@
+
+
 namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.Util
 {
     public static class Util
@@ -32,5 +34,8 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.Util
                 return GetRegularPath(combinePath);
             }
         }
+        
+        
+
     }
 }

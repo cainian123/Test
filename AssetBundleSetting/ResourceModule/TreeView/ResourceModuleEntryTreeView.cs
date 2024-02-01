@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
 {
-    public class ResourceModuleEntryTreeView : UnityEditor.IMGUI.Controls.TreeView
+    public class ResourceModuleEntryTreeView : BaseTreeView
     {
         internal enum SortOption
         {
@@ -38,6 +38,7 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
         {
             showBorder = true;
             m_ModuleGroupEditor = ed;
+            showAlternatingRowBackgrounds = true;
             columnIndexForTreeFoldouts = 0;
             multiColumnHeader.sortingChanged += OnSortingChanged;
         }
@@ -81,16 +82,47 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
             base.OnGUI(rect);
         }
         
-        void OnSortingChanged(MultiColumnHeader mch)
+        protected override void SortIfNeeded(UnityEditor.IMGUI.Controls.TreeViewItem root, IList<UnityEditor.IMGUI.Controls.TreeViewItem> rows)
         {
-            
+           
+            if (rows.Count <= 1)
+                return;
+
+            if (multiColumnHeader.sortedColumnIndex == -1)
+                return;
+
+            SortByColumn();
+
+            rows.Clear();
+            for (int i = 0; i < root.children.Count; i++)
+                rows.Add(root.children[i]);
+
+            Repaint();
+        }
+        
+        void SortByColumn()
+        {
+            var sortedColumns = multiColumnHeader.state.sortedColumns;
+
+            if (sortedColumns.Length == 0)
+                return;
+
+            List<ResourceModuleEntryTreeViewItem> assetList = new List<ResourceModuleEntryTreeViewItem>();
+            foreach(var item in rootItem.children)
+            {
+                assetList.Add(item as ResourceModuleEntryTreeViewItem);
+            }
+            var orderedItems = InitialOrder(assetList, sortedColumns);
+
+            rootItem.children = orderedItems.Cast<UnityEditor.IMGUI.Controls.TreeViewItem>().ToList();
         }
 
         protected override void SingleClickedItem(int id)
         {
             base.SingleClickedItem(id);
-            Debug.Log("---->SingleClickedItem: "+id);
+            //Debug.Log("---->SingleClickedItem: "+id);
             //选中
+            ShowClickAssetList(FindItemInVisibleRows(id));
         }
 
         protected override void ContextClicked()
@@ -130,7 +162,14 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
                 
                 menu.ShowAsContext();
             }
+        }
 
+        private void ShowClickAssetList(ResourceModuleEntryTreeViewItem treeViewItem)
+        {
+            if (m_ModuleGroupEditor != null && treeViewItem != null)
+            {
+                m_ModuleGroupEditor.window.ShowAssetList(treeViewItem.ResourceModuleInfo);
+            }
         }
         
         protected override bool CanMultiSelect(UnityEditor.IMGUI.Controls.TreeViewItem item)
@@ -209,7 +248,7 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
             return null;
         }
 
-        protected override UnityEditor.IMGUI.Controls.TreeViewItem BuildRoot()
+        protected override UnityEditor.IMGUI.Controls.TreeViewItem GetBuildRoot()
         {
             var root = new UnityEditor.IMGUI.Controls.TreeViewItem(-1, -1);
             root.children = new List<UnityEditor.IMGUI.Controls.TreeViewItem>();
@@ -224,7 +263,7 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
             }
             return root;
         }
-        
+
         protected override void RowGUI(RowGUIArgs args)
         {
             for (int i = 0; i < args.GetNumVisibleColumns(); ++i)
@@ -274,6 +313,23 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
                 default:
                     return Color.gray;
             }
+        }
+        
+        IOrderedEnumerable<ResourceModuleEntryTreeViewItem> InitialOrder(IEnumerable<ResourceModuleEntryTreeViewItem> myTypes, int[] columnList)
+        {
+            SortOption sortOption = m_SortOptions[columnList[0]];
+            bool ascending = multiColumnHeader.IsSortedAscending(columnList[0]);
+            switch (sortOption)
+            {
+                case SortOption.PackageName:
+                    return myTypes.Order(l => l.displayName, ascending);
+                case SortOption.PackageType:
+                    return myTypes.Order(l => ResourceModuleDataManager.Instance.GetPackageEnum(l.ResourceModuleInfo.packageName), ascending);
+               
+                default:
+                    return myTypes.Order(l => l.displayName, ascending);
+            }
+            
         }
     }
 }

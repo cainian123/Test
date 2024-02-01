@@ -1,4 +1,5 @@
-﻿using AssetStream.Editor.AssetBundleSetting.ResourceModule.Config;
+﻿using System.Collections.Generic;
+using AssetStream.Editor.AssetBundleSetting.ResourceModule.Config;
 using UnityEditor;
 
 namespace AssetStream.Editor.AssetBundleSetting.ResourceModule
@@ -113,6 +114,46 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule
                 if(autoSave)
                     SaveScriptableObjectData(data);
             }
+        }
+        
+        public bool AddAssetToResourceModule(string packageName,string[] assetPaths,bool autoSave = true)
+        {
+            if (m_ResourceModuleConfigs != null && m_ResourceModuleConfigs.TryGetValue(packageName, out var data))
+            {
+                if (data.AddAssetInfo(assetPaths))
+                {
+                    var moduleData = GetModuleData(packageName);
+                    if (moduleData != null)
+                    {
+                        moduleData.ForceLoadAssetInfo(data.assetConfigs);
+                    }
+                    if(autoSave)
+                        SaveScriptableObjectData(data);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        
+        public bool RemoveAssetFromResourceModule(string packageName,List<string> assetPaths,bool autoSave = true)
+        {
+            if (m_ResourceModuleConfigs != null && m_ResourceModuleConfigs.TryGetValue(packageName, out var data))
+            {
+                if (data.RemoveAssetInfo(assetPaths))
+                {
+                    var moduleData = GetModuleData(packageName);
+                    if (moduleData != null)
+                    {
+                        moduleData.ForceLoadAssetInfo(data.assetConfigs);
+                    }
+                    if(autoSave)
+                        SaveScriptableObjectData(data);
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

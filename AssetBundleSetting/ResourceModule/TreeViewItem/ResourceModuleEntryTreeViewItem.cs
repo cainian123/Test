@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeViewItem
 {
-    public class ResourceModuleEntryTreeViewItem:UnityEditor.IMGUI.Controls.TreeViewItem
+    public class ResourceModuleEntryTreeViewItem:BaseTreeViewItem
     {
         private ResourceModuleInfo m_ResourceModuleInfo;
         public ResourceModuleEntryTreeViewItem(ResourceModuleInfo e, int d) : base(e == null ? 0 : (e.packagePath).GetHashCode(), d, e == null || !e.IsHaveExit ? "[Missing Reference]" : e.packageName)

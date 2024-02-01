@@ -126,6 +126,22 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule
 
             return AssetPackageEnum.None;
         }
+
+        public ResourceModuleData GetModuleData(string packageName)
+        {
+            if (m_ResourceModuleDatas != null)
+            {
+                foreach (var moduleData in m_ResourceModuleDatas)
+                {
+                    if (string.Equals(moduleData.ResourceModuleName, packageName))
+                    {
+                        return moduleData;
+                    }
+                }
+            }
+
+            return null;
+        }
         
         private void AddResourceModule(string packageName,ResourceModuleConfig scriptableObject)
         {

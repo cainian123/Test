@@ -1,5 +1,6 @@
 
 using AssetStream.Editor.AssetBundleSetting.ResourceModule;
+using AssetStream.Editor.AssetBundleSetting.ResourceModule.Config;
 using AssetStream.Editor.AssetBundleSetting.ResourceModule.GUI;
 using UnityEditor;
 using UnityEngine;
@@ -32,6 +33,7 @@ public class ResourceModuleBrowserMain : EditorWindow, IHasCustomMenu, ISerializ
 
     [SerializeField] internal AssetInfoEditor m_AssetInfoEditor;
     
+    private ResourceModuleInfo currentSelectResourceModuleInfo;
     private ResourceModuleGroupEditor moduleGrouEditor
     {
         get
@@ -48,7 +50,7 @@ public class ResourceModuleBrowserMain : EditorWindow, IHasCustomMenu, ISerializ
         {
             if (m_AssetInfoEditor == null)
             {
-                m_AssetInfoEditor = new AssetInfoEditor(this);
+                m_AssetInfoEditor = new AssetInfoEditor(this,currentSelectResourceModuleInfo);
             }
 
             return m_AssetInfoEditor;
@@ -78,7 +80,6 @@ public class ResourceModuleBrowserMain : EditorWindow, IHasCustomMenu, ISerializ
         DrawTopBar();
         EditorGUILayout.BeginHorizontal();
         DrawResourceModulePackage();
-        //DrawSplitter(0);
         DrawResourceModuleList();
         DrawSplitter(1);
         DrawSearchArea();
@@ -94,7 +95,7 @@ public class ResourceModuleBrowserMain : EditorWindow, IHasCustomMenu, ISerializ
     {
         splitterRect=GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.Height(position.height),
             GUILayout.Width(1.0f));
-        EditorGUI.DrawRect(splitterRect, Color.black);
+        //EditorGUI.DrawRect(splitterRect, Color.black);
         if (index == 1)
         {
             Rect rect = new Rect(splitterRect.position,new Vector2(splitterRect.size.x + 2.0f,splitterRect.size.y));
@@ -115,8 +116,8 @@ public class ResourceModuleBrowserMain : EditorWindow, IHasCustomMenu, ISerializ
             {
                 float delta = Event.current.mousePosition.x - mouseStartPositionX;
                 currentDragWidth = Mathf.Max(0f, startFirstWidth + delta);
-                if (currentDragWidth < 200f)
-                    currentDragWidth = 200f;
+                if (currentDragWidth < 600f)
+                    currentDragWidth = 600f;
                 second_area_width = currentDragWidth;
                 Repaint();
             }
@@ -150,71 +151,16 @@ public class ResourceModuleBrowserMain : EditorWindow, IHasCustomMenu, ISerializ
     {
         Rect rect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.Width(first_area_widht+2),GUILayout.Height(position.height - top_barHeight));
         
-        /*var rect = EditorGUILayout.BeginVertical(GUILayout.Width(first_area_widht));
-        //rect.y = 40;
-        EditorGUILayout.BeginHorizontal(GUILayout.Height(40));
-      
-        // 设置标签样式
-        if (labelStyle == null)
-        {
-            labelStyle = new GUIStyle(EditorStyles.label);
-            labelStyle.alignment = TextAnchor.MiddleCenter;
-            labelStyle.fontStyle = FontStyle.Normal;
-            labelStyle.normal.textColor = Color.white;
-            labelStyle.normal.background = Texture2D.grayTexture;
-        }
-        // 绘制标签
-        EditorGUILayout.LabelField("模块名称", labelStyle);
-        GUILayout.FlexibleSpace();
-        EditorGUILayout.EndHorizontal();
-
-        scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(position.height));
-        
-        EditorGUILayout.BeginHorizontal();
-
-        if (ResourceModuleDataManager.Instance.ResourceModuleConfigs != null)
-        {
-            GUIStyle style = new GUIStyle(EditorStyles.label);
-             style.alignment = TextAnchor.MiddleCenter;
-             style.fontStyle = FontStyle.Normal;
-             style.normal.textColor = Color.white;
-            int i = 0;
-            foreach (var key in ResourceModuleDataManager.Instance.ResourceModuleConfigs.Keys)
-            { 
-                i++;
-               if (i % 2 == 0)
-               {
-                   style.normal.background = Texture2D.grayTexture;
-               }
-               else
-               {
-                   style.normal.background = Texture2D.blackTexture;
-               }
-               EditorGUILayout.LabelField(key,style);
-            }
-        }
-        
-        EditorGUILayout.EndHorizontal();
-        
-        EditorGUILayout.EndScrollView();
-        EditorGUILayout.EndVertical();*/
         if(moduleGrouEditor.OnGUI(rect))
             Repaint();
     }
 
     private void DrawResourceModuleList()
     {
-        EditorGUILayout.BeginVertical(GUILayout.Width(second_area_width));
-        scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(position.height));
-        EditorGUILayout.BeginHorizontal();
-        GUIStyle style = new GUIStyle(EditorStyles.label);
-        style.clipping = TextClipping.Clip;
-        GUILayout.Label("Second Area ---------------------------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>",style);
-
-        EditorGUILayout.EndHorizontal();
-        GUILayout.Label("Second Area -----");
-        EditorGUILayout.EndScrollView();
-        EditorGUILayout.EndVertical();
+        
+        Rect rect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.Width(second_area_width+2),GUILayout.Height(position.height - top_barHeight));
+        if(assetInfoEditor.OnGUI(rect))
+            Repaint();
     }
 
     private void DrawSearchArea()
@@ -234,6 +180,17 @@ public class ResourceModuleBrowserMain : EditorWindow, IHasCustomMenu, ISerializ
         }
         if(moduleGrouEditor != null)
             moduleGrouEditor.Reload();
+    }
+
+    public void ShowAssetList(ResourceModuleInfo info)
+    {
+        if(currentSelectResourceModuleInfo != null && currentSelectResourceModuleInfo.packageName.Equals(info.packageName))
+            return;
+        currentSelectResourceModuleInfo = info;
+        if (assetInfoEditor != null)
+        {
+            assetInfoEditor.Reload(info);
+        }
     }
     
     public void AddItemsToMenu(GenericMenu menu)
@@ -257,5 +214,8 @@ public class ResourceModuleBrowserMain : EditorWindow, IHasCustomMenu, ISerializ
             m_GroupEditor.OnDisable();
         if(m_AssetInfoEditor != null)
             m_AssetInfoEditor.OnDisable();
+        m_GroupEditor = null;
+        m_AssetInfoEditor = null;
+        currentSelectResourceModuleInfo = null;
     }
 }

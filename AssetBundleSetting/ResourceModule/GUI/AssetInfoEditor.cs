@@ -1,24 +1,29 @@
-﻿using AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView;
+﻿using System;
+using AssetStream.Editor.AssetBundleSetting.ResourceModule.Config;
+using AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
+
 namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.GUI
 {
+    [Serializable]
     public class AssetInfoEditor
     {
-        private ResourceModuleBrowserMain window;
+        public ResourceModuleBrowserMain window;
 
         private AssetInfoEntryTreeView m_EntryTree;
-        
+        private ResourceModuleInfo m_ResourceModuleInfo;
         [SerializeField]
         TreeViewState m_TreeState;
         [SerializeField]
         MultiColumnHeaderState m_Mchs;
         
         bool m_ResizingVerticalSplitter;
-        public AssetInfoEditor(ResourceModuleBrowserMain w)
+        public AssetInfoEditor(ResourceModuleBrowserMain w,ResourceModuleInfo info)
         {
             window = w;
+            m_ResourceModuleInfo = info;
             OnEnable();
         }
         
@@ -31,7 +36,9 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.GUI
         {
             if (m_EntryTree == null)
                 InitialiseEntryTree();
+        
             m_EntryTree.OnGUI(pos);
+            
             return m_ResizingVerticalSplitter;
         }
 
@@ -46,10 +53,22 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.GUI
                 MultiColumnHeaderState.OverwriteSerializedFields(m_Mchs, headerState);
             m_Mchs = headerState;
             
-            m_EntryTree = new AssetInfoEntryTreeView(m_TreeState, m_Mchs, this);
+            m_EntryTree = new AssetInfoEntryTreeView(m_TreeState, m_Mchs, this,m_ResourceModuleInfo==null ? "" :m_ResourceModuleInfo.packageName);
             m_EntryTree.Reload();
             return m_EntryTree;
         }
+
+        public void Reload(ResourceModuleInfo info)
+        {
+            if (info != null && info.IsHaveExit)
+            {
+                if (m_EntryTree != null)
+                {
+                    m_EntryTree.ShowAssetList(info.packageName);
+                }
+            }
+        }
+        
         
         public void OnDisable()
         {
