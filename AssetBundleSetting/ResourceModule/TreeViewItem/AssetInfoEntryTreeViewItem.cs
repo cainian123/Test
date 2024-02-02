@@ -17,5 +17,7 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeViewItem
             entry = e;
             assetIcon = e == null ? null : AssetDatabase.GetCachedIcon(e.FullAssetName) as Texture2D;
         }
+
+     
     }
 }

@@ -45,6 +45,8 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
             m_showPackageName = showPackageName;
             multiColumnHeader.sortingChanged += OnSortingChanged;
             showAlternatingRowBackgrounds = true;
+            //extraSpaceBeforeIconAndLabel = 20;
+            //customFoldoutYOffset = (20 - EditorGUIUtility.singleLineHeight) * 0.5f; 
         }
         
         
@@ -106,7 +108,7 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
                 }
             
             }
-   
+            SetupDepthsFromParentsAndChildren(root);
             return root;
         }
         
@@ -132,13 +134,16 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
         {
             AssetInfoEntryTreeViewItem viewItem = item as AssetInfoEntryTreeViewItem;
             Color oldColor = UnityEngine.GUI.color;
-            CenterRectUsingSingleLineHeight(ref cellRect);
+            //CenterRectUsingSingleLineHeight(ref cellRect);
 
             switch (m_SortOptions[column])
             {
                 case SortOption.Path:
                     if (Event.current.type == EventType.Repaint)
                     {
+                        float indent = GetContentIndent(item) + extraSpaceBeforeIconAndLabel;
+                        cellRect.xMin += indent;
+                        
                         var path = viewItem.entry.FullAssetName;
                         if (string.IsNullOrEmpty(path))
                             path =  "Missing File";
@@ -147,6 +152,7 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
                     break;   
                 case SortOption.Type:
                 {
+                    
                     if (viewItem.assetIcon != null)
                         UnityEngine.GUI.DrawTexture(cellRect, viewItem.assetIcon, ScaleMode.ScaleToFit, true);
                 }
@@ -203,7 +209,7 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
             if (node != null)
             {
                 GenericMenu menu = new GenericMenu();
-                menu.AddItem(new GUIContent("Rename"), false, RemoveItem, selectedNodes);
+                menu.AddItem(new GUIContent("Remove"), false, RemoveItem, selectedNodes);
                 menu.ShowAsContext();
             }
         }
@@ -212,12 +218,20 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
         {
             if (context is List<AssetInfoEntryTreeViewItem> selectedNodes && selectedNodes.Count > 0)
             {
-                List<string> paths = new List<string>();
+                Dictionary<string, string> paths = new Dictionary<string, string>();
                 foreach (var item in selectedNodes)
                 {
                     if (item != null)
                     {
-                        paths.Add(item.entry.FullAssetName);
+                        var parent=item.entry.GetRootParent();
+                        if (parent != null)
+                        {
+                            paths.Add(item.entry.FullAssetName, parent.FullAssetName);  
+                        }
+                        else
+                        {
+                            paths.Add(item.entry.FullAssetName, null);  
+                        }
                     }
                 }
                 

@@ -18,6 +18,8 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.Data
       
         private AssetBaseInfo m_Parent;
 
+        public AssetBaseInfo Parent => m_Parent;
+
         private List<AssetBaseInfo> m_child;
 
         private bool m_isScene;
@@ -50,6 +52,19 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.Data
             }
         }*/
 
+        public AssetBaseInfo GetRootParent()
+        {
+            if (Parent == null)
+            {
+                return this; 
+            }
+            else
+            {
+                return Parent.GetRootParent(); 
+            }
+            
+        } 
+        
         public void LoadChild(List<AssetInfoConfig> childConfigs,List<string> invalidChildConfigs)
         {
             if (m_isFolder)

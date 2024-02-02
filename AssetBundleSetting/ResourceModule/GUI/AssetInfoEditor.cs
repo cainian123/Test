@@ -10,6 +10,7 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.GUI
     [Serializable]
     public class AssetInfoEditor
     {
+        [SerializeField]
         public ResourceModuleBrowserMain window;
 
         private AssetInfoEntryTreeView m_EntryTree;

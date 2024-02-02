@@ -136,7 +136,7 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule
             return false;
         }
         
-        public bool RemoveAssetFromResourceModule(string packageName,List<string> assetPaths,bool autoSave = true)
+        public bool RemoveAssetFromResourceModule(string packageName,Dictionary<string, string> assetPaths,bool autoSave = true)
         {
             if (m_ResourceModuleConfigs != null && m_ResourceModuleConfigs.TryGetValue(packageName, out var data))
             {

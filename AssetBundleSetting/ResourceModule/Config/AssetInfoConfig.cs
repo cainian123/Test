@@ -34,6 +34,33 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.Config
                 return invalidChildConfigs;
             }
         }
+        
+        public bool RemoveInvalidChild(string childPath)
+        {
+            if (invalidChildConfigs != null && invalidChildConfigs.Count > 0)
+            {
+                if(invalidChildConfigs.Contains(childPath))
+                {
+                    invalidChildConfigs.Remove(childPath);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool AddInvalidChild(string path)
+        {
+            if (invalidChildConfigs == null)
+                invalidChildConfigs = new List<string>();
+            if ( !invalidChildConfigs.Contains(path))
+            {
+                invalidChildConfigs.Add(path);
+                return true;
+            }
+
+            return false;
+        }
 
         /*public List<AssetInfoConfig> ChildConfigs
         {

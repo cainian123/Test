@@ -87,9 +87,23 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.Config
                             assetConfigs = new List<AssetInfoConfig>();
                         }
 
-                        AssetInfoConfig config = new AssetInfoConfig(path);
-                        assetConfigs.Add(config);
-                        isAdd = true;
+                        bool isFindInvalid = false;
+                        foreach (var tempConfig in assetConfigs)
+                        {
+                            if(tempConfig.RemoveInvalidChild(path))
+                            {
+                                isFindInvalid = true;
+                                isAdd = true;
+                                break;
+                            }
+                        }
+
+                        if (!isFindInvalid)
+                        {
+                            AssetInfoConfig config = new AssetInfoConfig(path);
+                            assetConfigs.Add(config);
+                            isAdd = true;
+                        }
                     }
                 }
             }
@@ -97,11 +111,42 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.Config
             return isAdd;
         }
 
-        public bool RemoveAssetInfo(List<string> paths)
+        public bool RemoveAssetInfo(Dictionary<string, string> paths)
         {
+            bool isRemove = false;
+            if (paths != null && paths.Count > 0)
+            {
+                foreach (var path in paths.Keys)
+                {
+                    isRemove |= RemovePath(path,paths[path]);
+                }
+            }
+            return isRemove;
+        }
+
+        private bool RemovePath(string path,string parentPath)
+        {
+            var config = GetInfoConfig(path);
+            if (config != null)
+            {
+                assetConfigs.Remove(config);
+                return true;
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(parentPath))
+                {
+                    var parentConfig = GetInfoConfig(parentPath);
+                    if (parentConfig != null)
+                    {
+                        return parentConfig.AddInvalidChild(path);
+                    }
+                }
+            }
+
             return false;
         }
-        
+
         private bool CheckIsExit(string path)
         {
             if (assetConfigs != null)
@@ -115,8 +160,20 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.Config
             return false;
         }
         
+        private AssetInfoConfig GetInfoConfig(string path)
+        {
+            if (assetConfigs != null)
+            {
+                foreach (var configPath in assetConfigs)
+                {
+                    if (configPath.FullPath.Equals(path))
+                        return configPath;
+                }
+            }
+            return null;
+        }
         
-        
+
         /*public bool AddAssetInfo(string[] assetPaths)
         {
             if (assetPaths != null && assetPaths.Length > 0)
