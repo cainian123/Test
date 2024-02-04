@@ -24,8 +24,10 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
 
         protected virtual void SortIfNeeded(UnityEditor.IMGUI.Controls.TreeViewItem root, IList<UnityEditor.IMGUI.Controls.TreeViewItem> rows)
         {
-
+           
         }
+        
+
 
         protected override UnityEditor.IMGUI.Controls.TreeViewItem BuildRoot()
         {

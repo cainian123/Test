@@ -180,6 +180,18 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.Data
             }
             root.AddChild(viewItem);
         }
+        
+        public void AddToTree(ref List<string> paths)
+        {
+            paths.Add(m_AssetName);
+            if (m_child != null && m_child.Count > 0)
+            {
+                foreach (var assetBaseInfo in m_child)
+                {
+                    assetBaseInfo.AddToTree(ref paths);
+                }
+            }
+        }
 
         public string FullAssetName
         {

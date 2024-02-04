@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using AssetStream.Editor.AssetBundleSetting.ResourceModule.GUI;
 using AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeViewItem;
 using UnityEditor;
@@ -255,6 +256,54 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
             }
             return null;
         }
+
+        protected override void SortIfNeeded(UnityEditor.IMGUI.Controls.TreeViewItem root, IList<UnityEditor.IMGUI.Controls.TreeViewItem> rows)
+        {
+            if (rows.Count <= 1)
+                return;
+
+            if (multiColumnHeader.sortedColumnIndex == -1)
+                return;
+
+            SortByColumn();
+
+            rows.Clear();
+         
+            for (int i = 0; i < root.children.Count; i++)
+                rows.Add(root.children[i]);
+            Repaint();
+        }
         
+        void SortByColumn()
+        {
+            var sortedColumns = multiColumnHeader.state.sortedColumns;
+
+            if (sortedColumns.Length == 0)
+                return;
+
+            List<AssetInfoEntryTreeViewItem> assetList = new List<AssetInfoEntryTreeViewItem>();
+            foreach(var item in rootItem.children)
+            {
+                assetList.Add(item as AssetInfoEntryTreeViewItem);
+            }
+            var orderedItems = InitialOrder(assetList, sortedColumns);
+
+            rootItem.children = orderedItems.Cast<UnityEditor.IMGUI.Controls.TreeViewItem>().ToList();
+        }
+        
+        IOrderedEnumerable<AssetInfoEntryTreeViewItem> InitialOrder(IEnumerable<AssetInfoEntryTreeViewItem> myTypes, int[] columnList)
+        {
+            SortOption sortOption = m_SortOptions[columnList[0]];
+            bool ascending = multiColumnHeader.IsSortedAscending(columnList[0]);
+            switch (sortOption)
+            {
+                case SortOption.Path:
+                    return myTypes.Order(l => l.displayName, ascending);
+
+                default:
+                    return myTypes.Order(l => l.displayName, ascending);
+            }
+            
+        }
     }
 }

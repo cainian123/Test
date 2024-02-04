@@ -32,6 +32,7 @@ public class ResourceModuleBrowserMain : EditorWindow, IHasCustomMenu, ISerializ
     internal ResourceModuleGroupEditor m_GroupEditor;
 
     [SerializeField] internal AssetInfoEditor m_AssetInfoEditor;
+    [SerializeField] internal SearchEditor m_SearchEditor;
     
     private ResourceModuleInfo currentSelectResourceModuleInfo;
     private ResourceModuleGroupEditor moduleGrouEditor
@@ -54,6 +55,16 @@ public class ResourceModuleBrowserMain : EditorWindow, IHasCustomMenu, ISerializ
             }
 
             return m_AssetInfoEditor;
+        }
+    }
+    
+    private SearchEditor searchEditor
+    {
+        get
+        {
+            if (m_SearchEditor == null)
+                m_SearchEditor = new SearchEditor(this);
+            return m_SearchEditor;
         }
     }
     
@@ -165,10 +176,9 @@ public class ResourceModuleBrowserMain : EditorWindow, IHasCustomMenu, ISerializ
 
     private void DrawSearchArea()
     {
-        EditorGUILayout.BeginVertical(GUILayout.Width(third_area_width));
-        GUILayout.Label("Second Area");
-        // 添加其他GUI元素
-        EditorGUILayout.EndVertical();
+        Rect rect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.Width(third_area_width),GUILayout.Height(position.height - top_barHeight));
+        if(searchEditor.OnGUI(rect))
+            Repaint();
     }
     
     private void CreateNewResourceModule()

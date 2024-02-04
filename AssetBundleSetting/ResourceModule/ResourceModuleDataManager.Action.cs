@@ -155,5 +155,33 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule
 
             return false;
         }
+
+        public Dictionary<string, List<string>> GetAllAssetInfo()
+        {
+            if (m_ResourceModuleConfigs != null)
+            {
+                Dictionary<string, List<string>> tempAllPaths = new Dictionary<string, List<string>>();
+                foreach (var key in m_ResourceModuleConfigs.Keys)
+                {
+                    var moduleData = GetModuleData(key);
+                    if (moduleData != null)
+                    {
+                        if (moduleData.AssetConfigDatas != null && moduleData.AssetConfigDatas.Count > 0)
+                        {
+                            List<string> tempPaths = new List<string>();
+                            foreach (var info in moduleData.AssetConfigDatas)
+                            {
+                                info.AddToTree(ref tempPaths);
+                            }
+                            tempAllPaths.Add(key, tempPaths);
+                        }
+                    }
+                }
+
+                return tempAllPaths;
+            }
+
+            return null;
+        }
     }
 }
