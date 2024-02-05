@@ -7,6 +7,20 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
 {
     public class SearchAssetTreeView : BaseTreeView
     {
+        
+        internal enum SortOption
+        {
+            AssetPath,
+            ResurceModule
+          
+        }
+        SortOption[] m_SortOptions =
+        {
+            SortOption.AssetPath,
+            SortOption.ResurceModule,
+         
+        };
+        
         public SearchAssetTreeView(TreeViewState state) : base(state)
         {
         }
@@ -34,15 +48,24 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
             var retVal = new[]
             {
                 new MultiColumnHeaderState.Column(),
-                //new MultiColumnHeaderState.Column(),
+                new MultiColumnHeaderState.Column(),
             };
 
             int counter = 0;
             retVal[counter].headerContent = new GUIContent("Search Result", "Asset Name");
             retVal[counter].minWidth = 200;
             retVal[counter].width = 200;
-            retVal[counter].maxWidth = 200;
-            retVal[counter].headerTextAlignment = TextAlignment.Center;
+            retVal[counter].maxWidth = 600;
+            retVal[counter].headerTextAlignment = TextAlignment.Left;
+            retVal[counter].canSort = true;
+            retVal[counter].autoResize = true;
+            
+            counter ++;
+            retVal[counter].headerContent = new GUIContent("Group Name", "Resource Module Name");
+            retVal[counter].minWidth = 200;
+            retVal[counter].width = 200;
+            retVal[counter].maxWidth = 500;
+            retVal[counter].headerTextAlignment = TextAlignment.Left;
             retVal[counter].canSort = true;
             retVal[counter].autoResize = true;
 
@@ -66,12 +89,12 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
                 {
                     foreach (var key in allAssetDatas.Keys)
                     {
-                        var item = new SearchAssetEntryTreeViewItem(key.GetHashCode(), 0, key);
-                        item.children = new List<UnityEditor.IMGUI.Controls.TreeViewItem>();
+                        var item = new SearchAssetEntryTreeViewItem(key.GetHashCode(), 0, key,allAssetDatas[key]);
+                        /*item.children = new List<UnityEditor.IMGUI.Controls.TreeViewItem>();
                         foreach (var path in allAssetDatas[key])
                         {
-                            item.children.Add(new AssetInfoEntryTreeViewItem(path.GetHashCode(), 1, path));
-                        }
+                            item.children.Add(new SearchAssetEntryTreeViewItem(path.GetHashCode(), 1, path));
+                        }*/
                         root.AddChild(item);
                     }
                 }
@@ -95,11 +118,11 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
                         {
                             if (path.ToLower().Contains(searchString))
                             {
-                                if(tempData.TryGetValue(key, out var value))
-                                    value.Add(path);
+                                if(tempData.TryGetValue(path, out var value))
+                                    value.Add(key);
                                 else
                                 {
-                                    tempData.Add(key,new List<string>(){path});
+                                    tempData.Add(path,new List<string>(){key});
                                 }
                             }
                                 
@@ -111,6 +134,42 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
             }
 
             return null;
+        }
+        
+        protected override void RowGUI(RowGUIArgs args)
+        {
+            for (int i = 0; i < args.GetNumVisibleColumns(); ++i)
+                CellGUI(args.GetCellRect(i), args.item , args.GetColumn(i), ref args);
+        }
+
+        protected void CellGUI(Rect cellRect, UnityEditor.IMGUI.Controls.TreeViewItem item, int column, ref RowGUIArgs args)
+        {
+            SearchAssetEntryTreeViewItem viewItem = item as SearchAssetEntryTreeViewItem;
+            Color oldColor = UnityEngine.GUI.color;
+            CenterRectUsingSingleLineHeight(ref cellRect);
+
+            switch (m_SortOptions[column])
+            {
+                case SortOption.AssetPath:
+                {
+                    DefaultGUI.Label(
+                        cellRect,
+                        viewItem.displayName,
+                        args.selected,
+                        args.focused);
+                } 
+                    break;
+                case SortOption.ResurceModule:
+                {
+                    DefaultGUI.Label(
+                        cellRect,
+                        viewItem.resourceModule,
+                        args.selected,
+                        args.focused);
+                    break;
+                }
+            }
+            UnityEngine.GUI.color = oldColor;
         }
     }
 }

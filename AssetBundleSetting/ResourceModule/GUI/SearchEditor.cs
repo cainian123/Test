@@ -14,7 +14,7 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.GUI
         MultiColumnHeaderState m_Mchs;
         [SerializeField]
         public ResourceModuleBrowserMain window;
-
+        
         SearchField m_SearchField;
         private SearchAssetTreeView m_EntryTree;
         public SearchEditor(ResourceModuleBrowserMain w)
@@ -32,6 +32,8 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.GUI
         float searchHeight = 20f;
         public bool OnGUI(Rect pos)
         {
+            if(m_SearchField == null)
+                m_SearchField = new SearchField();
             if (m_EntryTree == null)
                 InitialiseEntryTree();
             

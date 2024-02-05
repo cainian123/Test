@@ -215,6 +215,16 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
             }
         }
 
+        protected override void DoubleClickedItem(int id)
+        {
+            if (FindItem(id, rootItem) is AssetInfoEntryTreeViewItem assetItem)
+            {
+                Object o = AssetDatabase.LoadAssetAtPath<Object>(assetItem.displayName);
+                EditorGUIUtility.PingObject(o);
+                Selection.activeObject = o;
+            }
+        }
+
         private void RemoveItem(object context)
         {
             if (context is List<AssetInfoEntryTreeViewItem> selectedNodes && selectedNodes.Count > 0)

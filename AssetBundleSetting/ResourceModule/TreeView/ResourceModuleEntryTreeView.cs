@@ -164,10 +164,12 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
             }
         }
 
+        private ResourceModuleEntryTreeViewItem selectTreeViewItem;
         private void ShowClickAssetList(ResourceModuleEntryTreeViewItem treeViewItem)
         {
             if (m_ModuleGroupEditor != null && treeViewItem != null)
             {
+                selectTreeViewItem = treeViewItem;
                 m_ModuleGroupEditor.window.ShowAssetList(treeViewItem.ResourceModuleInfo);
             }
         }
@@ -280,11 +282,20 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.TreeView
             {
                 case SortOption.PackageName:
                 {
+                   
+                    if (selectTreeViewItem != null)
+                    {
+                        if (selectTreeViewItem.displayName == viewItem.displayName)
+                        {
+                            UnityEngine.GUI.color = Color.blue;
+                        }
+                    }
                     DefaultGUI.Label(
                         cellRect,
                         viewItem.displayName,
                         args.selected,
                         args.focused);
+                    
                 } 
                     break;
                 case SortOption.PackageType:

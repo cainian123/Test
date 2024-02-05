@@ -176,7 +176,7 @@ public class ResourceModuleBrowserMain : EditorWindow, IHasCustomMenu, ISerializ
 
     private void DrawSearchArea()
     {
-        Rect rect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.Width(third_area_width),GUILayout.Height(position.height - top_barHeight));
+        Rect rect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.Width(position.width),GUILayout.Height(position.height - top_barHeight));
         if(searchEditor.OnGUI(rect))
             Repaint();
     }

@@ -8,7 +8,17 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.GUI
     [Serializable]
     public class ResourceModuleGroupEditor
     {
-        public ResourceModuleBrowserMain window;
+        private ResourceModuleBrowserMain _window;
+
+        public ResourceModuleBrowserMain window
+        {
+            get
+            {
+                if (_window == null)
+                    return ResourceModuleBrowserMain.instance;
+                return _window;
+            }
+        }
         
         private ResourceModuleEntryTreeView m_EntryTree;
         
@@ -20,7 +30,7 @@ namespace AssetStream.Editor.AssetBundleSetting.ResourceModule.GUI
         MultiColumnHeaderState m_Mchs;
         public ResourceModuleGroupEditor(ResourceModuleBrowserMain w)
         {
-            window = w;
+            _window = w;
             OnEnable();
         }
         
